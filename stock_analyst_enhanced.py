@@ -25,7 +25,7 @@ from crewai import Agent, Task, Crew, Process
 
 class Config:
     """Centralized configuration management"""
-    MODEL = "gemini/gemini-2.0-flash-exp"
+    MODEL = "gemini-2.0-flash"
     DAILY_LIMIT = 5  # Increased from 2
     MAX_NEWS_RESULTS = 10
     STOCK_HISTORY_PERIOD = "1mo"

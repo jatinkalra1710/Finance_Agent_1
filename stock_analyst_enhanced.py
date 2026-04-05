@@ -1,7 +1,8 @@
 """
-AI-Powered Stock Analysis Platform
-==================================
+AI-Powered Stock Analysis Platform - 7 Agent System
+====================================================
 A production-grade financial analysis system using Multi-Agent AI Architecture
+Featuring 7 specialized AI agents for comprehensive market analysis
 Author: [Your Name]
 """
 
@@ -25,8 +26,8 @@ from crewai import Agent, Task, Crew, Process
 
 class Config:
     """Centralized configuration management"""
-    MODEL = "gemini-2.0-flash"
-    DAILY_LIMIT = 5  # Increased from 2
+    MODEL = "gemini-2.5-flash"
+    DAILY_LIMIT = 5
     MAX_NEWS_RESULTS = 10
     STOCK_HISTORY_PERIOD = "1mo"
     CACHE_TTL = 3600  # 1 hour cache
@@ -62,7 +63,7 @@ class MarketIndices:
         "Mahindra & Mahindra": "M&M.NS",
         "Hindustan Unilever": "HINDUNILVR.NS",
         "Axis Bank": "AXISBANK.NS",
-        "Zomato": "ZOMATO.NS",  # Fixed ticker
+        "Zomato": "ZOMATO.NS",
         "Paytm": "PAYTM.NS",
         "Adani Enterprises": "ADANIENT.NS",
         "Tata Motors": "TATAMOTORS.NS",
@@ -330,164 +331,419 @@ def comprehensive_yfinance_data(ticker: str) -> str:
 
 
 # ============================================================================
-# AI AGENT SYSTEM
+# AI AGENT SYSTEM - 7 AGENTS
 # ============================================================================
 
 def create_analysis_crew(ticker: str, company_name: str) -> Crew:
     """
-    Creates a multi-agent crew for comprehensive stock analysis
+    Creates a 7-agent crew for comprehensive stock analysis
     
     Args:
         ticker: Stock ticker symbol
         company_name: Human-readable company name
         
     Returns:
-        Configured Crew instance
+        Configured Crew instance with 7 specialized agents
     """
     today = datetime.now().strftime("%B %d, %Y")
     
-    # Agent 1: Senior Market Research Analyst
+    # ========================================================================
+    # AGENT 1: Senior Market Research Analyst
+    # ========================================================================
     research_agent = Agent(
         role="Senior Market Research Analyst",
         goal=f"Gather and validate comprehensive financial data and news for {company_name} ({ticker}) as of {today}",
-        backstory="""You are a veteran market researcher with 15+ years at top investment banks.
-        You have access to multiple data sources and always cross-verify information.
-        You use web search as a backup when primary data sources fail.""",
+        backstory="""You are a veteran market researcher with 15+ years at top investment banks 
+        like Goldman Sachs and JP Morgan. You have access to multiple data sources and always 
+        cross-verify information. You use web search as a backup when primary data sources fail. 
+        You're known for your meticulous attention to detail and accuracy.""",
         tools=[comprehensive_yfinance_data, advanced_web_search],
         llm=Config.MODEL,
         verbose=True
     )
     
-    # Agent 2: Quantitative Analyst
+    # ========================================================================
+    # AGENT 2: Quantitative Financial Analyst
+    # ========================================================================
     quant_agent = Agent(
         role="Quantitative Financial Analyst",
-        goal="Perform technical and fundamental analysis on the gathered data",
-        backstory="""You are a PhD in Financial Engineering specializing in equity valuation.
-        You analyze price movements, valuation ratios, and financial health metrics.
-        You provide data-driven insights without speculation.""",
+        goal="Perform fundamental analysis on financial metrics and company valuation",
+        backstory="""You are a PhD in Financial Engineering from MIT, specializing in equity 
+        valuation and financial modeling. You analyze P/E ratios, market cap, revenue growth, 
+        profit margins, and other fundamental metrics. You compare companies against their 
+        industry peers and historical performance. You provide data-driven insights without 
+        speculation, always backing your analysis with numbers.""",
         llm=Config.MODEL,
         verbose=True
     )
     
-    # Agent 3: Market Sentiment & News Analyst
+    # ========================================================================
+    # AGENT 3: Technical Analyst
+    # ========================================================================
+    technical_agent = Agent(
+        role="Senior Technical Analyst",
+        goal="Analyze price trends, chart patterns, and technical indicators",
+        backstory="""You are a Chartered Market Technician (CMT) with 12+ years of experience 
+        in technical analysis. You analyze 52-week price ranges, volume trends, support and 
+        resistance levels, and price momentum. You identify chart patterns like head and shoulders, 
+        double tops/bottoms, and trend channels. You calculate relative strength and identify 
+        whether stocks are overbought or oversold. Your insights help time market entry and exit.""",
+        llm=Config.MODEL,
+        verbose=True
+    )
+    
+    # ========================================================================
+    # AGENT 4: Market Sentiment & News Analyst
+    # ========================================================================
     sentiment_agent = Agent(
         role="Market Sentiment & News Analyst",
         goal="Determine investor sentiment (Bullish/Bearish/Neutral) based on news and market behavior",
-        backstory="""You are a behavioral economist and former journalist who understands
-        how news cycles impact stock prices. You analyze sentiment from multiple angles:
-        news tone, analyst opinions, social sentiment, and market reaction.""",
+        backstory="""You are a behavioral economist and former Bloomberg journalist who understands 
+        how news cycles, social media, and analyst opinions impact stock prices. You analyze 
+        sentiment from multiple angles: news tone, analyst ratings, social media buzz, and market 
+        reaction to events. You can detect fear, greed, optimism, and pessimism in market behavior. 
+        You classify sentiment as Bullish, Bearish, Neutral, or Mixed with supporting evidence.""",
         llm=Config.MODEL,
         verbose=True
     )
     
-    # Agent 4: Chief Risk Officer
+    # ========================================================================
+    # AGENT 5: Sector & Industry Specialist
+    # ========================================================================
+    sector_agent = Agent(
+        role="Sector & Industry Specialist",
+        goal=f"Analyze {company_name}'s position within its industry and identify competitive dynamics",
+        backstory="""You are an industry analyst who has covered multiple sectors for major 
+        research firms. You understand industry trends, competitive landscapes, market share 
+        dynamics, and sector-specific risks. You compare companies against their direct competitors, 
+        identify market leaders and laggards, and spot emerging threats and opportunities. You 
+        analyze how macroeconomic factors, regulatory changes, and technological disruptions 
+        impact different sectors.""",
+        llm=Config.MODEL,
+        verbose=True
+    )
+    
+    # ========================================================================
+    # AGENT 6: Chief Risk Officer
+    # ========================================================================
     risk_agent = Agent(
         role="Chief Risk Officer",
         goal=f"Identify top 3-5 material risks facing {company_name} in current market conditions",
-        backstory="""You are a highly experienced risk manager who has navigated
-        multiple market crashes. You focus on: regulatory risks, macro-economic factors,
-        industry disruption, competitive threats, and company-specific vulnerabilities.""",
+        backstory="""You are a highly experienced risk manager who has navigated multiple market 
+        crashes including the 2008 financial crisis and 2020 COVID crash. You have a keen eye 
+        for spotting risks before they materialize. You focus on: regulatory and compliance risks, 
+        macroeconomic headwinds, industry disruption, competitive threats, management quality issues, 
+        debt and liquidity concerns, and company-specific vulnerabilities. You quantify risk impact 
+        and probability whenever possible.""",
         llm=Config.MODEL,
         verbose=True
     )
     
-    # Agent 5: Investment Strategist (Synthesizer)
+    # ========================================================================
+    # AGENT 7: Lead Investment Strategist (Synthesizer)
+    # ========================================================================
     strategist_agent = Agent(
-        role="Lead Investment Strategist",
+        role="Lead Investment Strategist & Portfolio Manager",
         goal="Synthesize all findings into an executive investment memo with actionable insights",
-        backstory="""You are a Managing Director at a top investment firm with $50B+ AUM.
-        You write clear, professional reports for institutional investors.
-        Your reports are balanced, data-driven, and include both bull and bear cases.""",
+        backstory="""You are a Managing Director and Portfolio Manager at a top investment firm 
+        managing $50B+ in assets. You have an MBA from Harvard Business School and 20+ years of 
+        experience. You write clear, professional reports for institutional investors, pension funds, 
+        and ultra-high-net-worth individuals. Your reports are balanced, data-driven, and include 
+        both bull and bear cases. You're known for your ability to synthesize complex information 
+        into actionable investment recommendations. You always consider risk-adjusted returns and 
+        investor suitability.""",
         llm=Config.MODEL,
         verbose=True
     )
     
-    # Define Tasks
+    # ========================================================================
+    # DEFINE TASKS FOR ALL 7 AGENTS
+    # ========================================================================
+    
     tasks = [
+        # Task 1: Data Gathering
         Task(
-            description=f"""Gather comprehensive data for {ticker}:
-            1. Current price, market cap, P/E ratio, 52-week range
-            2. Latest 5-10 news articles
-            3. Recent price movements and volume trends
-            4. Any earnings announcements or corporate actions
+            description=f"""Gather comprehensive data for {company_name} ({ticker}):
             
-            If YFinance fails, use web search as backup.""",
-            expected_output="Detailed data dossier with all metrics and news sources",
+            1. **Financial Metrics:**
+               - Current stock price
+               - Market capitalization
+               - P/E ratio and other valuation metrics
+               - 52-week high and low prices
+               - Trading volume (current vs average)
+            
+            2. **News & Events:**
+               - Latest 5-10 news articles
+               - Recent earnings announcements
+               - Corporate actions (dividends, splits, buybacks)
+               - Management changes or strategic initiatives
+            
+            3. **Market Context:**
+               - Recent price movements (1 week, 1 month, 3 months)
+               - Comparison with major indices (Nifty 50, Sensex)
+            
+            **Important:** If YFinance fails for any data point, use advanced_web_search as backup.
+            Verify all critical numbers from multiple sources when possible.""",
+            expected_output="Comprehensive data dossier with all metrics, news sources, and market context. Include exact numbers with sources.",
             agent=research_agent
         ),
         
+        # Task 2: Fundamental Analysis
         Task(
-            description=f"""Perform quantitative analysis on {ticker}:
-            1. Valuation assessment (is it overvalued/undervalued?)
-            2. Technical indicators and price trends
-            3. Comparison with industry peers
-            4. Financial health metrics
+            description=f"""Perform quantitative fundamental analysis on {company_name} ({ticker}):
             
-            Provide numerical analysis with context.""",
-            expected_output="Quantitative analysis report with metrics and interpretations",
+            1. **Valuation Analysis:**
+               - Is the P/E ratio high or low compared to industry average?
+               - Market cap analysis - is it fairly valued?
+               - Price-to-book ratio assessment if available
+               - Any other valuation metrics you can derive
+            
+            2. **Financial Health:**
+               - Revenue and profit trends (if available in news/reports)
+               - Debt levels and financial stability mentions
+               - Cash flow and liquidity indicators
+            
+            3. **Growth Prospects:**
+               - Historical price performance
+               - Growth trajectory based on available data
+               - Expansion plans or new business initiatives
+            
+            4. **Peer Comparison:**
+               - How does it compare to competitors in the same sector?
+               - Is it a market leader or follower?
+            
+            Provide numerical analysis with clear context and interpretations.""",
+            expected_output="Detailed fundamental analysis report with valuations, financial health assessment, and peer comparisons. Use specific numbers.",
             agent=quant_agent
         ),
         
+        # Task 3: Technical Analysis
         Task(
-            description=f"""Analyze market sentiment for {ticker}:
-            1. Review news articles for tone (positive/negative/neutral)
-            2. Identify key themes in recent coverage
-            3. Assess institutional vs retail sentiment
-            4. Classify overall sentiment: Bullish, Bearish, Neutral, or Mixed
+            description=f"""Perform technical analysis on {company_name} ({ticker}):
             
-            Support your classification with evidence.""",
-            expected_output="Sentiment analysis report with clear classification and reasoning",
+            1. **Price Trend Analysis:**
+               - Current price vs 52-week high/low - is it near support or resistance?
+               - Price momentum - uptrend, downtrend, or sideways?
+               - Distance from 52-week high/low (in percentage terms)
+            
+            2. **Volume Analysis:**
+               - Current volume vs average volume - is there unusual activity?
+               - Volume trends - increasing or decreasing?
+               - What does volume tell us about buying/selling pressure?
+            
+            3. **Key Levels:**
+               - Support levels (52-week low and intermediate supports)
+               - Resistance levels (52-week high and intermediate resistances)
+               - Psychological price levels
+            
+            4. **Technical Outlook:**
+               - Short-term outlook (1-4 weeks)
+               - Medium-term outlook (1-3 months)
+               - Are there any chart patterns visible?
+               - Is the stock overbought, oversold, or fairly priced technically?
+            
+            Base your analysis on the price data, 52-week range, and volume information available.""",
+            expected_output="Technical analysis report with price trends, volume analysis, support/resistance levels, and technical outlook with specific price targets if possible.",
+            agent=technical_agent
+        ),
+        
+        # Task 4: Sentiment Analysis
+        Task(
+            description=f"""Analyze market sentiment for {company_name} ({ticker}):
+            
+            1. **News Sentiment:**
+               - Review all news articles for overall tone (positive/negative/neutral)
+               - Identify key themes in recent coverage
+               - Are there any major controversies or positive developments?
+            
+            2. **Market Behavior:**
+               - How has the market reacted to recent news?
+               - Is there evidence of institutional buying or selling?
+               - What does price action tell us about sentiment?
+            
+            3. **Analyst Sentiment:**
+               - Any analyst upgrades/downgrades mentioned in news?
+               - What are professional analysts saying?
+            
+            4. **Overall Classification:**
+               - Classify sentiment as: **Bullish 📈**, **Bearish 📉**, **Neutral ⚖️**, or **Mixed Signals ⚡**
+               - Provide strong evidence for your classification
+               - Rate sentiment intensity (mildly/moderately/strongly bullish or bearish)
+            
+            Support all conclusions with specific examples from news and market data.""",
+            expected_output="Comprehensive sentiment analysis with clear classification (Bullish/Bearish/Neutral/Mixed), evidence from news, and market behavior insights.",
             agent=sentiment_agent
         ),
         
+        # Task 5: Sector & Competitive Analysis
         Task(
-            description=f"""Identify and explain the TOP 3-5 risks for {ticker}:
-            1. Regulatory/Compliance risks
-            2. Macroeconomic headwinds
-            3. Industry/Competitive threats
-            4. Company-specific vulnerabilities
-            5. Market/Liquidity risks
+            description=f"""Analyze {company_name} ({ticker}) within its industry context:
             
-            For each risk, explain the potential impact.""",
-            expected_output="Comprehensive risk assessment with prioritized list",
+            1. **Industry Identification:**
+               - What sector/industry does this company operate in?
+               - What are the key characteristics of this industry?
+            
+            2. **Competitive Position:**
+               - Who are the main competitors?
+               - What is the company's market share or ranking?
+               - Is it a market leader, challenger, or follower?
+            
+            3. **Industry Trends:**
+               - What are the major trends affecting this industry?
+               - Is the industry growing, stable, or declining?
+               - Any regulatory changes impacting the sector?
+            
+            4. **Competitive Advantages/Disadvantages:**
+               - What are the company's strengths vs competitors?
+               - What are its weaknesses or vulnerabilities?
+               - Does it have any moats (brand, technology, network effects)?
+            
+            5. **Sector Outlook:**
+               - What's the outlook for this sector in India?
+               - How do macroeconomic factors affect this industry?
+            
+            Use information from news and general industry knowledge.""",
+            expected_output="Industry and competitive analysis report covering sector trends, competitive positioning, market share, and outlook.",
+            agent=sector_agent
+        ),
+        
+        # Task 6: Risk Assessment
+        Task(
+            description=f"""Identify and explain the TOP 3-5 material risks for {company_name} ({ticker}):
+            
+            Analyze and prioritize risks in these categories:
+            
+            1. **Regulatory/Compliance Risks:**
+               - Government policy changes
+               - Regulatory investigations or penalties
+               - Compliance issues
+            
+            2. **Macroeconomic Risks:**
+               - Interest rate sensitivity
+               - Currency risks
+               - Inflation impact
+               - Economic slowdown effects
+            
+            3. **Industry/Competitive Risks:**
+               - New entrants or disruptive competitors
+               - Technology disruption
+               - Market share loss
+               - Pricing pressure
+            
+            4. **Company-Specific Risks:**
+               - Management quality concerns
+               - Debt and leverage issues
+               - Operational challenges
+               - Customer concentration
+            
+            5. **Market/Liquidity Risks:**
+               - Stock volatility
+               - Low liquidity issues
+               - Market sentiment shifts
+            
+            For each identified risk:
+            - **Explain** what the risk is
+            - **Assess impact:** High/Medium/Low
+            - **Assess probability:** Likely/Possible/Unlikely
+            - **Provide mitigation:** What could reduce this risk?
+            
+            Prioritize by severity (probability × impact).""",
+            expected_output="Comprehensive risk assessment with TOP 3-5 prioritized risks, each with impact level, probability, and mitigation strategies.",
             agent=risk_agent
         ),
         
+        # Task 7: Final Investment Memo
         Task(
             description=f"""Create the final Executive Investment Memo for {company_name} ({ticker}).
             
-            Structure:
+            Synthesize insights from all 6 previous analysts into a cohesive, professional report.
+            
+            **Required Structure:**
+            
             ## Executive Summary
-            - One-paragraph overview with key recommendation
+            - 3-4 sentence overview capturing the investment opportunity
+            - Clear statement of recommendation context (not financial advice)
             
             ## Current Market Position
-            - Price, valuation, and recent performance
+            - Stock price and recent performance
+            - Valuation metrics (P/E, market cap)
+            - Technical position (trend, key levels)
             
             ## Investment Thesis
-            - Bull case (reasons to buy)
-            - Bear case (reasons to avoid/sell)
             
-            ## Sentiment Analysis
-            - Current market sentiment with supporting evidence
+            ### Bull Case 💚
+            - 3-5 compelling reasons to consider this stock
+            - Use insights from fundamental, technical, and sector analysis
+            - Include specific data points
             
-            ## Risk Factors
-            - Top 3-5 material risks
+            ### Bear Case 🔴
+            - 3-5 reasons for caution or to avoid
+            - Include competitive threats and valuation concerns
+            - Reference the risk assessment
             
-            ## Conclusion
-            - Balanced assessment
-            - Target investor profile (who should consider this?)
+            ## Market Sentiment Analysis
+            - Overall sentiment classification (Bullish/Bearish/Neutral/Mixed)
+            - Evidence from news and market behavior
+            - 2-3 sentences explaining the sentiment
             
-            Use **Indian Rupees (₹)** for all currency values.
-            Include today's date: {today}
-            Be professional, balanced, and data-driven.""",
-            expected_output="Professional markdown-formatted investment memo ready for institutional investors",
+            ## Industry & Competitive Context
+            - Sector overview and trends
+            - Competitive positioning
+            - Industry outlook
+            
+            ## Technical Outlook
+            - Short-term and medium-term technical view
+            - Key support and resistance levels
+            - Volume and momentum analysis
+            
+            ## Key Risk Factors
+            List the TOP 3-5 risks with:
+            1. **[Risk Name]:** Description, Impact, Probability
+            2. **[Risk Name]:** Description, Impact, Probability
+            [Continue for all major risks]
+            
+            ## Financial Snapshot
+            - Table or bullets with key metrics
+            - Current Price, Market Cap, P/E, 52-Week Range, Volume
+            
+            ## Conclusion & Suitability
+            - Balanced final assessment
+            - **Target Investor Profile:** Who should consider this? (Growth investors, value investors, income seekers, aggressive traders, conservative long-term holders)
+            - Investment horizon recommendation (short-term swing, medium-term hold, long-term investment)
+            
+            **Formatting Requirements:**
+            - Use **Indian Rupees (₹)** for all currency values
+            - Include today's date: {today}
+            - Use markdown formatting with headers, bold, bullets
+            - Be professional, balanced, and data-driven
+            - Length: 1000-1500 words
+            - Include specific numbers and percentages throughout
+            
+            **Tone:**
+            - Professional and institutional-grade
+            - Objective and balanced (show both sides)
+            - Data-driven with evidence
+            - Clear and actionable
+            - Educational (explain why, not just what)""",
+            expected_output="Complete professional investment memo in markdown format, 1000-1500 words, covering all required sections with data-driven insights and balanced perspective.",
             agent=strategist_agent
         )
     ]
     
-    # Create and return crew
+    # ========================================================================
+    # CREATE AND RETURN CREW
+    # ========================================================================
+    
     crew = Crew(
-        agents=[research_agent, quant_agent, sentiment_agent, risk_agent, strategist_agent],
+        agents=[
+            research_agent,
+            quant_agent,
+            technical_agent,
+            sentiment_agent,
+            sector_agent,
+            risk_agent,
+            strategist_agent
+        ],
         tasks=tasks,
         process=Process.sequential,
         verbose=True
@@ -498,7 +754,7 @@ def create_analysis_crew(ticker: str, company_name: str) -> Crew:
 
 def run_analysis(ticker: str, company_name: str) -> str:
     """
-    Execute the full AI-powered analysis workflow
+    Execute the full 7-agent AI-powered analysis workflow
     
     Args:
         ticker: Stock ticker symbol
@@ -523,7 +779,7 @@ def run_analysis(ticker: str, company_name: str) -> str:
 def setup_page():
     """Configure Streamlit page"""
     st.set_page_config(
-        page_title="AI Stock Analyst Pro",
+        page_title="AI Stock Analyst Pro - 7 Agent System",
         page_icon="📊",
         layout="centered",
         initial_sidebar_state="expanded"
@@ -535,6 +791,7 @@ def render_sidebar():
     with st.sidebar:
         st.image("https://img.icons8.com/clouds/200/stock-market.png", width=120)
         st.title("📊 AI Stock Analyst")
+        st.caption("7-Agent Multi-AI System")
         st.markdown("---")
         
         # Usage metrics
@@ -566,14 +823,17 @@ def render_sidebar():
         
         st.markdown("---")
         
-        # Info section
-        with st.expander("ℹ️ About This Tool"):
+        # Agent info section
+        with st.expander("🤖 7-Agent AI System"):
             st.markdown("""
-            **Multi-Agent AI System**
-            - 5 specialized AI agents
-            - Real-time market data
-            - News sentiment analysis
-            - Comprehensive risk assessment
+            **Specialized AI Agents:**
+            1. 📊 Market Research Analyst
+            2. 🔢 Quantitative Analyst
+            3. 📈 Technical Analyst
+            4. 📰 Sentiment Analyst
+            5. 🏭 Sector Specialist
+            6. ⚠️ Chief Risk Officer
+            7. 💼 Investment Strategist
             
             **Tech Stack:**
             - CrewAI for orchestration
@@ -587,9 +847,20 @@ def render_main_ui():
     """Render main application interface"""
     st.title("🤖 AI-Powered Stock Analysis Platform")
     st.markdown("""
-    Generate **institutional-grade investment memos** using a multi-agent AI system.
+    Generate **institutional-grade investment memos** using a **7-agent multi-AI system**.
     Powered by advanced LLMs and real-time market data.
     """)
+    
+    # Feature highlights
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("🤖 AI Agents", "7", help="Specialized agents for comprehensive analysis")
+    with col2:
+        st.metric("📊 Data Sources", "3+", help="yFinance, Tavily News, Web Search")
+    with col3:
+        st.metric("⚡ Avg Time", "45-60s", help="Complete analysis time")
+    
+    st.markdown("---")
     
     st.info("""
     💡 **How to find ticker symbols:**
@@ -655,7 +926,7 @@ def render_main_ui():
     can_run, remaining = RateLimiter.can_analyze()
     
     if st.button(
-        "🚀 Generate Investment Memo",
+        "🚀 Generate Investment Memo (7 AI Agents)",
         type="primary",
         disabled=not (can_run and target_ticker),
         use_container_width=True
@@ -668,19 +939,21 @@ def render_main_ui():
         RateLimiter.increment_usage(target_ticker)
         
         # Run analysis
-        with st.status("🤖 AI Agents are analyzing the market...", expanded=True) as status:
-            st.write("⚙️ Initializing multi-agent system...")
-            st.write("📊 Fetching real-time market data...")
-            st.write("📰 Scanning latest news and sentiment...")
-            st.write("⚠️ Assessing risk factors...")
-            st.write("📝 Synthesizing investment memo...")
+        with st.status("🤖 7 AI Agents are analyzing the market...", expanded=True) as status:
+            st.write("⚙️ **Agent 1:** Research Analyst gathering data...")
+            st.write("🔢 **Agent 2:** Quantitative Analyst evaluating fundamentals...")
+            st.write("📈 **Agent 3:** Technical Analyst studying charts...")
+            st.write("📰 **Agent 4:** Sentiment Analyst reading news...")
+            st.write("🏭 **Agent 5:** Sector Specialist analyzing industry...")
+            st.write("⚠️ **Agent 6:** Risk Officer assessing threats...")
+            st.write("💼 **Agent 7:** Investment Strategist synthesizing report...")
             
             report = run_analysis(target_ticker, company_name or target_ticker)
             
-            status.update(label="✅ Analysis Complete!", state="complete", expanded=False)
+            status.update(label="✅ Analysis Complete! 7 Agents Collaborated Successfully", state="complete", expanded=False)
         
         # Display report
-        st.success("🎉 Investment Memo Generated Successfully!")
+        st.success("🎉 Investment Memo Generated by 7-Agent AI System!")
         st.markdown("---")
         
         # Report header
@@ -693,12 +966,14 @@ def render_main_ui():
             st.markdown("**DATE:**")
             st.markdown("**RE:**")
             st.markdown("**ASSET:**")
+            st.markdown("**SYSTEM:**")
         with col2:
             st.markdown("Investment Committee")
-            st.markdown("AI-Powered Analysis System")
+            st.markdown("7-Agent AI Analysis System")
             st.markdown(datetime.now().strftime("%B %d, %Y"))
-            st.markdown("Strategic Outlook & Risk Assessment")
+            st.markdown("Comprehensive Strategic Outlook & Risk Assessment")
             st.markdown(f"**{company_name}** (`{target_ticker}`)")
+            st.markdown("Multi-Agent AI Collaboration")
         
         st.markdown("---")
         
@@ -707,9 +982,9 @@ def render_main_ui():
         
         # Download button
         st.download_button(
-            label="📥 Download Report",
+            label="📥 Download Investment Memo",
             data=report,
-            file_name=f"{target_ticker}_investment_memo_{datetime.now().strftime('%Y%m%d')}.md",
+            file_name=f"{target_ticker}_7agent_investment_memo_{datetime.now().strftime('%Y%m%d')}.md",
             mime="text/markdown"
         )
         
@@ -763,7 +1038,8 @@ def main():
     st.markdown("---")
     st.markdown("""
     <div style='text-align: center; color: #666; font-size: 0.9em;'>
-        <p>Built with ❤️ using CrewAI, Streamlit & Google Gemini</p>
+        <p>🤖 Powered by 7-Agent Multi-AI System</p>
+        <p>Built with CrewAI, Streamlit & Google Gemini 2.0</p>
         <p>© 2026 AI Stock Analyst Pro | For Educational Use Only</p>
     </div>
     """, unsafe_allow_html=True)

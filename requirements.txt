@@ -1,26 +1,15 @@
-# Core Framework
 streamlit>=1.28.0
 python-dotenv>=1.0.0
-
-# AI & LLM
-crewai>=0.1.0
-crewai-tools>=0.1.0
-
-# Financial Data
+crewai[google-genai]==0.28.8
+crewai-tools==0.1.6
+google-generativeai>=0.3.0
+pydantic>=2.0.0,<3.0.0
 yfinance>=0.2.28
 pandas>=2.0.0
 numpy>=1.24.0
-
-# Web Search
 tavily-python>=0.3.0
-
-# Additional Utilities
 requests>=2.31.0
 python-dateutil>=2.8.2
-
-# Testing (Optional)
-pytest>=7.4.0
-pytest-cov>=4.1.0
-
-# Logging & Monitoring
+chromadb>=0.4.22
+pydantic-settings>=2.0.0
 loguru>=0.7.0
